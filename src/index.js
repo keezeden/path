@@ -14,7 +14,8 @@ const grid = rows.map((_, i) => columns.map((_, j) => ({ row: i, column: j })));
 
 const App = () => {
   const [config, setConfig] = useState({
-    algorithm: "a-star"
+    algorithm: "a-star",
+    start: false
   });
 
   useEffect(() => {
