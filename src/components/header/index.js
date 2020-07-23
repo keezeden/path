@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { Selector } from "../selector";
+import { Tools } from "../tools";
 
 const Header = ({ useConfig }) => {
   const [config, setConfig] = useConfig;
@@ -40,7 +40,8 @@ const Header = ({ useConfig }) => {
         />
       </div>
       <div className="flex justify-center">
-        <Selector useConfig={useConfig} />
+        <Tools useConfig={useConfig} />
+        <p className="ml-2 w-2 capitalize">{config.tool}</p>
       </div>
       <div className="flex justify-center">
         <button
