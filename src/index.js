@@ -24,6 +24,8 @@ const App = () => {
     start: false
   });
 
+  const useGrid = [grid, setGrid];
+
   const startAStar = () => {
     const get = getNodeByMaterial(grid);
 
@@ -51,7 +53,7 @@ const App = () => {
   return (
     <div className="m-12 inline-block">
       <Header useConfig={[config, setConfig]} />
-      <Grid tool={config.tool} grid={grid} />
+      <Grid tool={config.tool} useGrid={useGrid} />
     </div>
   );
 };
