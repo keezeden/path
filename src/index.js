@@ -3,6 +3,8 @@ import { useState, useEffect } from "preact/hooks";
 
 import { Header, Grid } from "./components";
 import "./index.css";
+import { aStar } from "./algorithms/astar";
+import { getNode } from "./utilities/getNode";
 
 const GRID_WIDTH = 30;
 const GRID_HEIGHT = 15;
@@ -22,7 +24,15 @@ const App = () => {
   });
 
   useEffect(() => {
-    console.log("Config updated: ", config);
+    const { start, algorithm } = config;
+    if (start) {
+      console.log(`Running ${algorithm} algorithm`);
+      switch (algorithm) {
+        case "a-star":
+          const get = getNode(grid);
+          return aStar(get("start"), get("end"));
+      }
+    }
   }, [config]);
 
   return (
