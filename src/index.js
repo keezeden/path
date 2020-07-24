@@ -4,7 +4,7 @@ import { useState, useEffect } from "preact/hooks";
 import { Header, Grid } from "./components";
 import "./index.css";
 import { aStar } from "./algorithms/astar";
-import { getNode, getNodeByMaterial } from "./utilities/getNode";
+import { getNodeByMaterial } from "./utilities/getNode";
 
 const GRID_WIDTH = 30;
 const GRID_HEIGHT = 15;
@@ -12,25 +12,30 @@ const GRID_HEIGHT = 15;
 const columns = Array(GRID_WIDTH).fill();
 const rows = Array(GRID_HEIGHT).fill();
 
-const grid = rows.map((_, i) =>
+const GRID = rows.map((_, i) =>
   columns.map((_, j) => ({ row: i, column: j, material: "none" }))
 );
 
-const startAStar = () => {
-  const get = getNodeByMaterial(grid);
-
-  console.log("start result", get("start"));
-  console.log("end result", get("end"));
-
-  return aStar(get("start"), get("end"));
-};
-
 const App = () => {
+  const [grid, setGrid] = useState(GRID);
   const [config, setConfig] = useState({
     algorithm: "a-star",
     tool: "wall",
     start: false
   });
+
+  const startAStar = () => {
+    const get = getNodeByMaterial(grid);
+
+    console.log("start result", get("start"));
+    console.log("end result", get("end"));
+    const useGrid = [grid, setGrid];
+    return aStar(get("start"), get("end"), useGrid);
+  };
+
+  useEffect(() => {
+    console.log("Im updating in app");
+  }, [grid]);
 
   useEffect(() => {
     const { start, algorithm } = config;

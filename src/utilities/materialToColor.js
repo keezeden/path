@@ -8,6 +8,8 @@ const materialToColor = material => {
       return "red";
     case "path":
       return "purple";
+    case "successor":
+      return "pink";
     case "none":
       return "white";
     default:

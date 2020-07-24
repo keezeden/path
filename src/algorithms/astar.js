@@ -16,7 +16,9 @@ const min = (array, field) =>
     return prev[field] < curr[field] ? prev : curr;
   });
 
-const aStar = (start, end, cost) => {
+const aStar = (start, end, useGrid) => {
+  const [grid, setGrid] = useGrid;
+
   const closedNodes = [];
   const openNodes = [start];
 
@@ -25,10 +27,11 @@ const aStar = (start, end, cost) => {
 
     const shortest = min(totals, "total");
 
-    const shortestRef = getNodeByPosition(shortest.row, shortest.column);
-    shortestRef.material = "path";
+    const gridCopy = [...grid];
 
-    console.log("shortest", shortest);
+    gridCopy[shortest.row][shortest.column].material = "path";
+
+    setGrid(gridCopy);
 
     const item = openNodes.find(node => same(node, shortest));
 
@@ -41,10 +44,10 @@ const aStar = (start, end, cost) => {
         const child = {
           parent: shortest,
           row: shortest.row + rowOffset,
-          column: shortest.column + columnOffset
+          column: shortest.column + columnOffset,
+          material: "successor"
         };
 
-        console.log("Child", child);
         return child;
       })
     );
@@ -54,7 +57,7 @@ const aStar = (start, end, cost) => {
 
     openNodes.map(node => {
       if (same(shortest, end)) {
-        console.log("lets go found it", shortest);
+        console.log("Solved", shortest);
         openNodes.length = 0;
       }
 
