@@ -10,7 +10,9 @@ const GRID_HEIGHT = 15;
 const columns = Array(GRID_WIDTH).fill();
 const rows = Array(GRID_HEIGHT).fill();
 
-const grid = rows.map((_, i) => columns.map((_, j) => ({ row: i, column: j })));
+const grid = rows.map((_, i) =>
+  columns.map((_, j) => ({ row: i, column: j, material: "none" }))
+);
 
 const App = () => {
   const [config, setConfig] = useState({

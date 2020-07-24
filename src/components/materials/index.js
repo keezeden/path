@@ -1,6 +1,6 @@
 import { h } from "preact";
 
-const Tools = ({ useConfig }) => {
+const Materials = ({ useConfig }) => {
   const [config, setConfig] = useConfig;
 
   const handleSelectTool = tool => () =>
@@ -24,4 +24,4 @@ const Tools = ({ useConfig }) => {
   );
 };
 
-export { Tools };
+export { Materials };

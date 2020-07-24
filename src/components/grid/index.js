@@ -7,12 +7,7 @@ const Grid = ({ grid, tool }) => {
   return grid.map(row => (
     <div className="-mb-2">
       {row.map(cell => (
-        <Cell
-          tool={tool}
-          row={cell.row}
-          column={cell.column}
-          size={CELL_SIZE}
-        />
+        <Cell tool={tool} cell={cell} size={CELL_SIZE} />
       ))}
     </div>
   ));
