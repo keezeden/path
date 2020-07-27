@@ -4,7 +4,7 @@ import { useState, useEffect } from "preact/hooks";
 import { Header, Grid } from "./components";
 import "./index.css";
 import { aStar } from "./algorithms/astar";
-import { getNodeByMaterial } from "./utilities/getNode";
+import { getNodeByEntity, getWalls } from "./utilities/getNode";
 
 const GRID_WIDTH = 30;
 const GRID_HEIGHT = 15;
@@ -16,6 +16,15 @@ const GRID = rows.map((_, i) =>
   columns.map((_, j) => ({ row: i, column: j, material: "none" }))
 );
 
+const updateNode = (grid, node, config) => {
+  const { row: x, column: y } = node;
+
+  const copy = [...grid];
+  copy[x][y] = { ...node, ...config };
+
+  return copy;
+};
+
 const App = () => {
   const [grid, setGrid] = useState(GRID);
   const [config, setConfig] = useState({
@@ -26,18 +35,28 @@ const App = () => {
 
   const useGrid = [grid, setGrid];
 
-  const startAStar = () => {
-    const get = getNodeByMaterial(grid);
+  const runAStar = () => {
+    const get = getNodeByEntity(grid);
 
-    console.log("start result", get("start"));
-    console.log("end result", get("end"));
-    const useGrid = [grid, setGrid];
-    return aStar(get("start"), get("end"), useGrid);
+    const start = get("start");
+    const walls = getWalls(grid);
+    const end = get("end");
+
+    const [bests, candidates] = aStar(start, walls, end);
+
+    console.log(bests, candidates);
+
+    candidates.map(candidate =>
+      setGrid(grid => updateNode(grid, candidate, { material: "candidate" }))
+    );
+
+    bests.map(best =>
+      setGrid(grid => updateNode(grid, best, { material: "path" }))
+    );
+
+    setGrid(grid => updateNode(grid, start, { material: "start" }));
+    setGrid(grid => updateNode(grid, end, { material: "end" }));
   };
-
-  useEffect(() => {
-    console.log("Im updating in app");
-  }, [grid]);
 
   useEffect(() => {
     const { start, algorithm } = config;
@@ -45,7 +64,7 @@ const App = () => {
       console.log(`Running ${algorithm} algorithm`);
       switch (algorithm) {
         case "a-star":
-          return startAStar();
+          return runAStar();
       }
     }
   }, [config]);

@@ -1,73 +1,115 @@
-import { getNode, getNodeByPosition } from "../utilities/getNode";
+// const aStar = (start, end, useGrid) => {
+//   const [grid, setGrid] = useGrid;
 
-// Get total 'f' value of a node
-const total = node => node.costToStart || 0 + node.costToEnd || 0;
+import { same } from "../utilities/areNodesSame";
+import { manhattan } from "../utilities/calculateManhattan";
+import { min } from "../utilities/getMin";
 
-const manhattan = (node, end) =>
-  Math.abs(node.row - end.row) + Math.abs(node.column - end.column);
+const { total } = require("../utilities/getTotalCost");
 
-// Compare 2 node positions
-const same = (nodeA, nodeB) =>
-  nodeA.row === nodeB.row && nodeA.column === nodeB.column;
+//   const closedNodes = [];
+//   const openNodes = [start];
 
-// Get min total value from array
-const min = (array, field) =>
-  array.reduce((prev, curr) => {
-    return prev[field] < curr[field] ? prev : curr;
-  });
+//   while (openNodes.length > 0) {
+//     const totals = openNodes.map(node => ({ ...node, total: total(node) }));
 
-const aStar = (start, end, useGrid) => {
-  const [grid, setGrid] = useGrid;
+//     const shortest = min(totals, "total");
 
-  const closedNodes = [];
-  const openNodes = [start];
+//     const item = openNodes.find(node => same(node, shortest));
 
-  while (openNodes.length > 0) {
-    const totals = openNodes.map(node => ({ ...node, total: total(node) }));
+//     openNodes.splice(openNodes.indexOf(item), 1);
 
-    const shortest = min(totals, "total");
+//     const offSets = [1, 0, -1];
 
-    const gridCopy = [...grid];
+//     const children = offSets.map(rowOffset =>
+//       offSets.map(columnOffset => {
+//         const child = {
+//           parent: shortest,
+//           row: shortest.row + rowOffset,
+//           column: shortest.column + columnOffset,
+//           material: "successor"
+//         };
 
-    gridCopy[shortest.row][shortest.column].material = "path";
+//         return child;
+//       })
+//     );
 
-    setGrid(gridCopy);
+//     openNodes.length = 0;
+//     children.map(row => row.map(child => openNodes.push(child)));
 
-    const item = openNodes.find(node => same(node, shortest));
+//     openNodes.map(node => {
+//       if (same(shortest, end)) {
+//         console.log("Solved", shortest);
+//         openNodes.length = 0;
+//       }
 
-    openNodes.splice(openNodes.indexOf(item), 1);
+//       node.costToStart = shortest.costToStart + 1;
+//       node.costToEnd = manhattan(node, end);
+//       node.total = total(node);
+//     });
 
-    const offSets = [1, 0, -1];
+//     closedNodes.push(shortest);
+//   }
+// };
 
-    const children = offSets.map(rowOffset =>
-      offSets.map(columnOffset => {
-        const child = {
-          parent: shortest,
-          row: shortest.row + rowOffset,
-          column: shortest.column + columnOffset,
-          material: "successor"
-        };
+// export { aStar };
 
-        return child;
+const init = node => {
+  if (!node.toStart) node.toStart = 0;
+  if (!node.toEnd) node.toEnd = 0;
+  if (!node.total) node.total = total(node);
+  return node;
+};
+
+const offsets = [1, 0, -1];
+
+const aStar = (start, walls, end) => {
+  const candidates = [];
+  const closed = [];
+  const open = [start];
+
+  while (open.length > 0) {
+    const totals = open.map(node => init(node));
+
+    const best = min(totals, "toEnd");
+
+    console.log("Best was", best.toEnd);
+
+    const item = open.find(node => same(node, best));
+
+    open.splice(open.indexOf(item), 1);
+
+    const children = offsets.map(i =>
+      offsets.map(j => ({
+        parent: best,
+        row: best.row + i,
+        column: best.column + j
+      }))
+    );
+
+    open.length = 0;
+    children.map(row =>
+      row.map(col => {
+        //if (walls.some(wall => same(wall, col)))
+        //return console.log("This nigga overlappin");
+        open.push(col);
+        candidates.push(col);
       })
     );
 
-    openNodes.length = 0;
-    children.map(row => row.map(child => openNodes.push(child)));
+    open.map(node => {
+      if (same(best, end)) open.length = 0;
 
-    openNodes.map(node => {
-      if (same(shortest, end)) {
-        console.log("Solved", shortest);
-        openNodes.length = 0;
-      }
-
-      node.costToStart = shortest.costToStart + 1;
-      node.costToEnd = manhattan(node, end);
+      node.toStart = best.toStart + 1;
+      node.toEnd = manhattan(node, end);
       node.total = total(node);
     });
 
-    closedNodes.push(shortest);
+    console.log("Best was", best);
+    closed.push(best);
   }
+  console.log("Finished Astar algorithm!");
+  return [closed, candidates];
 };
 
 export { aStar };

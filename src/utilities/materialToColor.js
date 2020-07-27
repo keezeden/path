@@ -8,7 +8,7 @@ const materialToColor = material => {
       return "red";
     case "path":
       return "purple";
-    case "successor":
+    case "candidate":
       return "pink";
     case "none":
       return "white";
