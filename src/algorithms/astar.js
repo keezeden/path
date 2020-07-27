@@ -83,29 +83,40 @@ const aStar = (start, walls, end) => {
       offsets.map(j => ({
         parent: best,
         row: best.row + i,
-        column: best.column + j
+        column: best.column + j,
+        value: i === 0 || j === 0 ? 10 : 14
       }))
     );
 
     open.length = 0;
-    children.map(row =>
-      row.map(col => {
-        //if (walls.some(wall => same(wall, col)))
-        //return console.log("This nigga overlappin");
-        open.push(col);
-        candidates.push(col);
-      })
-    );
 
-    open.map(node => {
-      if (same(best, end)) open.length = 0;
+    const successors = children.reduce((prev, curr) => prev.concat(curr));
 
-      node.toStart = best.toStart + 1;
+    successors.map(node => {
+      if (same(best, end)) return (open.length = 0);
+
+      node.toStart = best.toStart + node.value;
       node.toEnd = manhattan(node, end);
       node.total = total(node);
+
+      const worseOpen = open.some(o => {
+        const isSame = same(o, node);
+        return o.total < node.total && isSame;
+      });
+
+      const worseClosed = closed.some(o => {
+        const isSame = same(o, node);
+        return o.total < node.total && isSame;
+      });
+
+      const isWall = walls.some(wall => same(wall, node));
+
+      if (worseOpen || worseClosed || isWall) return;
+
+      open.push(node);
+      candidates.push(node);
     });
 
-    console.log("Best was", best);
     closed.push(best);
   }
   console.log("Finished Astar algorithm!");
